@@ -10,7 +10,6 @@ export type RegisterUserFormData = {
 }
 
 export const registerUser = async (data: RegisterUserFormData) => {
-  console.log(data,"!!");
   if (data.password !== data.confirmPassword) {
     throw new Error("Passwords do not match");
   }
