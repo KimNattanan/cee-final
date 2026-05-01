@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const token = await createAuthToken(user.id, user.email);
+  const token = await createAuthToken(user.id, user.email, user.username);
 
   const response = NextResponse.json({ message: "Login successful" });
 

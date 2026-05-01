@@ -1,4 +1,4 @@
-import { SignJWT } from "jose";
+import { SignJWT, jwtVerify } from "jose";
 
 export const AUTH_COOKIE_NAME = "auth-token";
 
@@ -16,11 +16,39 @@ function getSecretKey() {
   return new TextEncoder().encode(secret);
 }
 
-export async function createAuthToken(userId: string, email: string) {
-  return new SignJWT({ email })
+export async function createAuthToken(userId: string, email: string, username: string) {
+  return new SignJWT({ email, username })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(userId)
     .setIssuedAt()
     .setExpirationTime(JWT_EXPIRES)
     .sign(getSecretKey());
+}
+
+export type AuthTokenClaims = {
+  userId: string;
+  email: string;
+  username: string;
+};
+
+/**
+ * Verifies signature + expiry, then returns claims. Invalid or expired tokens return null.
+ */
+export async function decodeAuthToken(
+  token: string,
+): Promise<AuthTokenClaims | null> {
+  try {
+    const { payload } = await jwtVerify(token, getSecretKey(), {
+      algorithms: ["HS256"],
+    });
+    const userId = typeof payload.sub === "string" ? payload.sub : null;
+    const email = typeof payload.email === "string" ? payload.email : null;
+    const username = typeof payload.username === "string" ? payload.username : null;
+    if (!userId || !email || !username) {
+      return null;
+    }
+    return { userId, email, username };
+  } catch {
+    return null;
+  }
 }

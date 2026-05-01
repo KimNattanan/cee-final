@@ -14,3 +14,9 @@ export interface LoginUserRequest {
   email: string;
   password: string;
 }
+
+export interface UserResponse {
+  userId: string;
+  email: string;
+  username: string;
+}

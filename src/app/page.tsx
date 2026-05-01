@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import Link from "next/link";
 import { LogoutButton } from "@/features/auth/components/logout-button";
 
@@ -15,6 +14,9 @@ export default function Home() {
         <Button>Register</Button>
       </Link>
       <LogoutButton />
+      <Link href="/webrtc">
+        <Button>WebRTC</Button>
+      </Link>
     </div>
   );
 }

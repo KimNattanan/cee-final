@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     password: hashedPassword,
   });
 
-  const token = await createAuthToken(user.id, user.email);
+  const token = await createAuthToken(user.id, user.email, user.username);
 
   const response = NextResponse.json({ message: "Registered successfully" });
 
