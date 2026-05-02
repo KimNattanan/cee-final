@@ -13,6 +13,9 @@ const nextConfig: NextConfig = {
   //   };
   //   return config;
   // },
+  images: {
+    remotePatterns: [new URL('https://loremflickr.com/**')],
+  },
 };
 
 export default nextConfig;

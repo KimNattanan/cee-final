@@ -6,6 +6,7 @@ import { UserResponse } from "@/features/auth/types/users";
 import { getUser } from "@/lib/auth";
 import * as handGesture from "@/lib/hand-gesture";
 import { HandLandmarker } from "@mediapipe/tasks-vision";
+import { randomImageUrl } from "@/lib/random-image";
 
 export const Webcam = ({
   videoStream,
@@ -13,18 +14,27 @@ export const Webcam = ({
   username,
   email,
   muted = true,
+  /** URLs chosen by the person in this feed (from signaling); preferred when prediction matches. */
+  peerChosenImages,
+  /** After resolving an image for this feed, publish so the call partner can reuse it. */
+  onPredictionImageReady,
 }: {
   videoStream: MediaStream;
   userId: string;
   username: string;
   email: string;
   muted?: boolean;
+  peerChosenImages?: Record<string, string>;
+  onPredictionImageReady?: (prediction: string, imageUrl: string) => void;
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const handLandmarkerRef = useRef<HandLandmarker | null>(null);
   const data1HandRef = useRef<any[]>([]);
   const data2HandRef = useRef<any[]>([]);
   const [prediction, setPrediction] = useState<string>("loading...");
+  /** Bumps when prediction becomes a new label so loremflickr URLs are not browser-cached. */
+  const [loremCacheBust, setLoremCacheBust] = useState(0);
+  const [imageUrl, setImageUrl] = useState<string>("");
   const [handLandmarker, setHandLandmarker] = useState<HandLandmarker | null>(null);
   const [data1Hand, setData1Hand] = useState<any[]>([]);
   const [data2Hand, setData2Hand] = useState<any[]>([]);
@@ -43,6 +53,24 @@ export const Webcam = ({
     }
     loadData();
   }, []);
+
+  const showLoremPreview =
+    prediction !== "loading..." &&
+    prediction !== "unknown" &&
+    prediction !== "need both hands" &&
+    prediction !== "searching...";
+
+  useEffect(() => {
+    if (showLoremPreview) {
+      setLoremCacheBust((n) => n + 1);
+      setImageUrl("");
+      (async () => {
+        const url = await randomImageUrl(prediction);
+        setImageUrl(url);
+        onPredictionImageReady?.(prediction, url);
+      })();
+    }
+  }, [prediction, showLoremPreview, onPredictionImageReady]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -91,6 +119,10 @@ export const Webcam = ({
       video.srcObject = null;
     };
   }, [videoStream]);
+
+  const displayImageUrl =
+    peerChosenImages?.[prediction] ?? imageUrl;
+
   return (
     <div>
       <div>{username} ({email})</div>
@@ -106,6 +138,15 @@ export const Webcam = ({
         />
       </div>
       <div>Prediction: {prediction}</div>
+      {showLoremPreview && displayImageUrl && displayImageUrl.length > 0 && (
+        <div className="border rounded-2xl p-2 border-rose-400 w-fit">
+          <img
+            key={`${prediction}-${loremCacheBust}-${displayImageUrl.slice(-24)}`}
+            src={displayImageUrl}
+            alt="Prediction"
+          />
+        </div>
+      )}
     </div>
   );
 };

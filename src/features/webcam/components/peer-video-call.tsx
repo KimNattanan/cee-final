@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { io, type Socket } from "socket.io-client";
 import { toast } from "sonner";
 import type { UserResponse } from "@/features/auth/types/users";
@@ -42,6 +42,15 @@ export function PeerVideoCall({ peerId }: { peerId: string }) {
   const [self, setSelf] = useState<UserResponse | null>(null);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
+  const socketRef = useRef<Socket | null>(null);
+  /** Partner's chosen preview URLs keyed by gesture label (from `webrtc:gesture-preview`). */
+  const [peerPreviewByPrediction, setPeerPreviewByPrediction] = useState<
+    Record<string, string>
+  >({});
+
+  const emitGesturePreview = useCallback((prediction: string, imageUrl: string) => {
+    socketRef.current?.emit("webrtc:gesture-preview", { prediction, imageUrl });
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -222,6 +231,31 @@ export function PeerVideoCall({ peerId }: { peerId: string }) {
         transports: ["websocket", "polling"],
       });
 
+      socketRef.current = socket;
+
+      socket.on(
+        "webrtc:gesture-preview",
+        (msg: {
+          fromUserId?: string;
+          prediction?: string;
+          imageUrl?: string;
+        }) => {
+          if (cancelled) return;
+          if (
+            typeof msg.fromUserId !== "string" ||
+            msg.fromUserId !== peerId ||
+            typeof msg.prediction !== "string" ||
+            typeof msg.imageUrl !== "string"
+          ) {
+            return;
+          }
+          setPeerPreviewByPrediction((prev) => ({
+            ...prev,
+            [msg.prediction!]: msg.imageUrl!,
+          }));
+        },
+      );
+
       socket.on("webrtc:signal", (msg: { type: string; payload: unknown }) => {
         if (cancelled) return;
         if (!pc) {
@@ -256,6 +290,8 @@ export function PeerVideoCall({ peerId }: { peerId: string }) {
 
     return () => {
       cancelled = true;
+      socketRef.current = null;
+      setPeerPreviewByPrediction({});
       socket?.removeAllListeners();
       socket?.disconnect();
       pc?.close();
@@ -285,6 +321,7 @@ export function PeerVideoCall({ peerId }: { peerId: string }) {
                 username={self.username}
                 email={self.email}
                 muted
+                onPredictionImageReady={emitGesturePreview}
               />
             ) : (
               <div className="text-sm text-muted-foreground">
@@ -301,6 +338,7 @@ export function PeerVideoCall({ peerId }: { peerId: string }) {
                 username="Peer"
                 email={`id: ${peerId}`}
                 muted={false}
+                peerChosenImages={peerPreviewByPrediction}
               />
             ) : (
               <div className="text-sm text-muted-foreground">

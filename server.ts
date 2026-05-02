@@ -151,6 +151,34 @@ void app.prepare().then(() => {
       },
     );
 
+    socket.on(
+      "webrtc:gesture-preview",
+      ({
+        prediction,
+        imageUrl,
+      }: {
+        prediction?: string;
+        imageUrl?: string;
+      }) => {
+        const roomId = data.roomId;
+        const claims = data.claims;
+        if (
+          !roomId ||
+          typeof prediction !== "string" ||
+          prediction.length === 0 ||
+          typeof imageUrl !== "string" ||
+          imageUrl.length === 0
+        ) {
+          return;
+        }
+        socket.to(roomId).emit("webrtc:gesture-preview", {
+          fromUserId: claims.userId,
+          prediction,
+          imageUrl,
+        });
+      },
+    );
+
     socket.on("disconnecting", () => {
       const roomId = data.roomId;
       if (roomId) {
