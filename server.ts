@@ -1,4 +1,4 @@
-import { createServer } from "node:http";
+import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { parse } from "node:url";
 import next from "next";
 import { Server } from "socket.io";
@@ -27,6 +27,23 @@ type SocketData = {
   roomId?: string;
 };
 
+/** When Nginx proxies HTTP to Node, send users to HTTPS (Nginx must listen on 443 with TLS first). */
+function redirectHttpToHttpsIfNeeded(
+  req: IncomingMessage,
+  res: ServerResponse,
+): boolean {
+  if (dev || process.env.FORCE_HTTPS_REDIRECT !== "true") return false;
+  const raw = req.headers["x-forwarded-proto"];
+  const proto = (Array.isArray(raw) ? raw[0] : raw)?.toLowerCase();
+  if (proto !== "http") return false;
+  const host = req.headers.host;
+  if (!host) return false;
+  const path = req.url ?? "/";
+  res.writeHead(301, { Location: `https://${host}${path}` });
+  res.end();
+  return true;
+}
+
 const dev = process.env.NODE_ENV !== "production";
 const hostname = process.env.HOSTNAME ?? "localhost";
 const port = Number.parseInt(process.env.PORT ?? "3000", 10);
@@ -36,6 +53,7 @@ const handle = app.getRequestHandler();
 
 void app.prepare().then(() => {
   const httpServer = createServer((req, res) => {
+    if (redirectHttpToHttpsIfNeeded(req, res)) return;
     const parsedUrl = parse(req.url ?? "", true);
     void handle(req, res, parsedUrl);
   });
