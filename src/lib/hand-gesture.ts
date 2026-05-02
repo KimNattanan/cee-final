@@ -8,6 +8,7 @@ const THRESHOLD_2_HAND = 0.8;
 export const loadData = async () => {
   const data1Hand = await fetch(`${HANDS_OUTPUT_DIR}/hand1output.json`).then(res => res.json());
   const data2Hand = await fetch(`${HANDS_OUTPUT_DIR}/hand2output.json`).then(res => res.json());
+  const data2HandRelate = await fetch(`${HANDS_OUTPUT_DIR}/hand2relateoutput.json`).then(res => res.json());
   return { data1Hand, data2Hand };
 }
 
@@ -34,14 +35,15 @@ function normalizeLandmarks(landmarks: NormalizedLandmark[]) {
   const ref = translated[9];
   let scale = Math.sqrt(ref.x**2 + ref.y**2 + ref.z**2) || 1e-6;
   let scaled = translated.map(pt => ({ x: pt.x / scale, y: pt.y / scale, z: pt.z / scale }));
-  const refRot = scaled[5];
-  const angle = Math.atan2(refRot.y, refRot.x);
-  const cosA = Math.cos(-angle), sinA = Math.sin(-angle);
-  return scaled.map(pt => ({
-    x: pt.x * cosA - pt.y * sinA,
-    y: pt.x * sinA + pt.y * cosA,
-    z: pt.z
-  }));
+  // const refRot = scaled[5];
+  // const angle = Math.atan2(refRot.y, refRot.x);
+  // const cosA = Math.cos(-angle), sinA = Math.sin(-angle);
+  // return scaled.map(pt => ({
+  //   x: pt.x * cosA - pt.y * sinA,
+  //   y: pt.x * sinA + pt.y * cosA,
+  //   z: pt.z
+  // }));
+  return scaled
 }
 
 function classify(handMode: number, results: HandLandmarkerResult, data1Hand: any[], data2Hand: any[]): string {
@@ -51,7 +53,16 @@ function classify(handMode: number, results: HandLandmarkerResult, data1Hand: an
   if (handMode === 1) {
     record = normalizeLandmarks(results.landmarks[0]).flatMap(lm => [lm.x, lm.y, lm.z]);
     return findNearest(record, data1Hand, THRESHOLD_1_HAND);
-  } else {
+  } else if(handMode===2) {
+    let left = null, right = null;
+    results.handedness.forEach((h, i) => {
+      const flat = normalizeLandmarks(results.landmarks[i]).flatMap(lm => [lm.x, lm.y, lm.z]);
+      if (h[0].categoryName === "Left") left = flat;
+      else right = flat;
+    });
+    if (left && right) return findNearest([...left, ...right], data2Hand, THRESHOLD_2_HAND);
+    return "need both hands";
+  } else{
     let left = null, right = null;
     results.handedness.forEach((h, i) => {
       const flat = normalizeLandmarks(results.landmarks[i]).flatMap(lm => [lm.x, lm.y, lm.z]);
