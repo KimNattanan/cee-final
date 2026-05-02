@@ -28,6 +28,52 @@ export const initMediaPipe = async () => {
   return handLandmarker;
 }
 
+// def normalize_2hand_landmark(left_hand,right_hand):
+//     # 1. Identify Left Wrist (Master Pivot) and Left Knuckle (Master Scale Reference)
+//     left_wrist = left_hand[0]
+//     left_m_knuckle = left_hand[9]
+
+//     # 2. Calculate the Left Hand Scale
+//     dx = left_m_knuckle.x - left_wrist.x
+//     dy = left_m_knuckle.y - left_wrist.y
+//     dz = left_m_knuckle.z - left_wrist.z
+//     master_scale = (dx**2 + dy**2 + dz**2)**0.5
+
+//     # 3. Create a unified normalized list
+//     normalized_all = []
+
+//     # Process Left Hand
+//     for lm in left_hand:
+//         norm_x = (lm.x - left_wrist.x) / master_scale
+//         norm_y = (lm.y - left_wrist.y) / master_scale
+//         norm_z = (lm.z - left_wrist.z) / master_scale
+//         normalized_all.append(norm_x)
+//         normalized_all.append(norm_y)
+//         normalized_all.append(norm_z)
+
+//     # Process Right Hand
+//     for lm in right_hand:
+//         norm_x = (lm.x - left_wrist.x) / master_scale
+//         norm_y = (lm.y - left_wrist.y) / master_scale
+//         norm_z = (lm.z - left_wrist.z) / master_scale
+//         normalized_all.append(norm_x)
+//         normalized_all.append(norm_y)
+//         normalized_all.append(norm_z)
+//     return normalized_all
+
+function normalizeLandmarksRelate(left_hand: NormalizedLandmark[],right_hand: NormalizedLandmark[]){
+  const left_wrist = left_hand[0]
+  let left_m_knuckle = left_hand[9]
+  const dx = left_m_knuckle.x - left_wrist.x
+  let dy = left_m_knuckle.y - left_wrist.y
+  let dz = left_m_knuckle.z - left_wrist.z
+  let master_scale = (dx**2 + dy**2 + dz**2)**0.5
+  // let normalized_all:NormalizedLandmark[] = [];
+  let translated_left = left_hand.map(lm => ({ x: (lm.x - left_wrist.x) / master_scale, y: (lm.y - left_wrist.y) / master_scale, z: (lm.z - left_wrist.z) / master_scale }));
+  let translated_right = right_hand.map(lm => ({ x: (lm.x - left_wrist.x) / master_scale, y: (lm.y - left_wrist.y) / master_scale, z: (lm.z - left_wrist.z) / master_scale }));
+  return [...translated_left,...translated_right]
+}
+
 // 3. The Classification & Normalization Logic
 function normalizeLandmarks(landmarks: NormalizedLandmark[]) {
   const base = landmarks[0];
@@ -93,7 +139,10 @@ function findNearest(record: number[], dataset: any[], threshold: number): strin
 export const predictFromVideo = (video: HTMLVideoElement, handLandmarker: HandLandmarker, data1Hand: any[], data2Hand: any[]): string => {
   const results = handLandmarker.detectForVideo(video, performance.now());
   if (results.landmarks) {
-    let text = classify(2, results, data1Hand, data2Hand);
+    let text = classify(3, results, data1Hand, data2Hand);
+    if (text.includes("searching") || text.includes("need")) {
+      text = classify(2, results, data1Hand, data2Hand);
+    }
     if (text.includes("searching") || text.includes("need")) {
       text = classify(1, results, data1Hand, data2Hand);
     }
