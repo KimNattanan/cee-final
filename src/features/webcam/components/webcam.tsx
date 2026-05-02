@@ -31,6 +31,7 @@ export const Webcam = ({
   const handLandmarkerRef = useRef<HandLandmarker | null>(null);
   const data1HandRef = useRef<any[]>([]);
   const data2HandRef = useRef<any[]>([]);
+  const data2HandRelateRef = useRef<any[]>([]);
   const [prediction, setPrediction] = useState<string>("loading...");
   /** Bumps when prediction becomes a new label so loremflickr URLs are not browser-cached. */
   const [loremCacheBust, setLoremCacheBust] = useState(0);
@@ -38,10 +39,12 @@ export const Webcam = ({
   const [handLandmarker, setHandLandmarker] = useState<HandLandmarker | null>(null);
   const [data1Hand, setData1Hand] = useState<any[]>([]);
   const [data2Hand, setData2Hand] = useState<any[]>([]);
+  const [data2HandRelate, setData2HandRelate] = useState<any[]>([]);
 
   handLandmarkerRef.current = handLandmarker;
   data1HandRef.current = data1Hand;
   data2HandRef.current = data2Hand;
+  data2HandRelateRef.current = data2HandRelate;
 
   useEffect(() => {
     const loadData = async () => {
@@ -84,6 +87,7 @@ export const Webcam = ({
       const lm = handLandmarkerRef.current;
       const d1 = data1HandRef.current;
       const d2 = data2HandRef.current;
+      const d3 = data2HandRelateRef.current;
 
       if (
         video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA &&
@@ -91,7 +95,7 @@ export const Webcam = ({
         d1.length > 0 &&
         d2.length > 0
       ) {
-        const next = handGesture.predictFromVideo(video, lm, d1, d2);
+        const next = handGesture.predictFromVideo(video, lm, d1, d2,d3);
         setPrediction((prev) => (prev === next ? prev : next));
       } else {
         setPrediction((prev) => (prev === "loading..." ? prev : "loading..."));

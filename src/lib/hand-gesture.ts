@@ -3,13 +3,25 @@ import { HandLandmarker, FilesetResolver, HandLandmarkerResult, NormalizedLandma
 const HANDS_OUTPUT_DIR = '/hand_gesture_detection';
 const THRESHOLD_1_HAND = 4.0;
 const THRESHOLD_2_HAND = 0.8;
+const MOVE_THRESHOLD = 0.1
 
+function apiBase() {
+  return (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
+}
 // 1. Load your JSON datasets
 export const loadData = async () => {
-  const data1Hand = await fetch(`${HANDS_OUTPUT_DIR}/hand1output.json`).then(res => res.json());
-  const data2Hand = await fetch(`${HANDS_OUTPUT_DIR}/hand2output.json`).then(res => res.json());
-  const data2HandRelate = await fetch(`${HANDS_OUTPUT_DIR}/hand2relateoutput.json`).then(res => res.json());
-  return { data1Hand, data2Hand };
+  const handData:{
+    data:[
+      {handmode:number}
+    ]
+  } = await fetch(`${apiBase()}/hand`).then(res => res.json());
+  // const data1Hand = await fetch(`${HANDS_OUTPUT_DIR}/hand1output.json`).then(res => res.json());
+  // const data2Hand = await fetch(`${HANDS_OUTPUT_DIR}/hand2output.json`).then(res => res.json());
+  // const data2HandRelate = await fetch(`${HANDS_OUTPUT_DIR}/hand2relateoutput.json`).then(res => res.json());
+  const data1Hand = handData.data.filter(hand => hand.handmode===1);
+  const data2Hand = handData.data.filter(hand => hand.handmode===2);
+  const data2HandRelate = handData.data.filter(hand => hand.handmode===3);
+  return { data1Hand, data2Hand,data2HandRelate };
 }
 
 // 2. Initialize MediaPipe
@@ -92,8 +104,8 @@ function normalizeLandmarks(landmarks: NormalizedLandmark[]) {
   return scaled
 }
 
-function classify(handMode: number, results: HandLandmarkerResult, data1Hand: any[], data2Hand: any[]): string {
-  if (!results.landmarks || results.landmarks.length < 1 || (handMode === 2 && results.landmarks.length < 2)) return "searching...";
+function classify(handMode: number, results: HandLandmarkerResult, data1Hand: any[], data2Hand: any[],data2HandRelate:any[]): string {
+  if (!results.landmarks || results.landmarks.length < 1 || ((handMode === 2 || handMode===3) && results.landmarks.length < 2)) return "searching...";
   
   let record = [];
   if (handMode === 1) {
@@ -136,15 +148,41 @@ function findNearest(record: number[], dataset: any[], threshold: number): strin
   return label;
 }
 
-export const predictFromVideo = (video: HTMLVideoElement, handLandmarker: HandLandmarker, data1Hand: any[], data2Hand: any[]): string => {
+export const getLandmark =(image:HTMLVideoElement,handLandmarker:HandLandmarker,handMode:number):number[] =>{
+  const results = handLandmarker.detectForVideo(image,performance.now());
+  if (!results.landmarks || results.landmarks.length < 1 || ((handMode === 2 || handMode===3) && results.landmarks.length < 2)) return [];
+  if (handMode === 1) {
+    let record = normalizeLandmarks(results.landmarks[0]).flatMap(lm => [lm.x, lm.y, lm.z]).flat();
+    return record;
+  } else if(handMode===2) {
+    let left = null, right = null;
+    results.handedness.forEach((h, i) => {
+      const flat = normalizeLandmarks(results.landmarks[i]).flatMap(lm => [lm.x, lm.y, lm.z]).flat();
+      if (h[0].categoryName === "Left") left = flat;
+      else right = flat;
+    });
+    if (left && right) return [...left, ...right];
+  } else{
+    let left = null, right = null;
+    results.handedness.forEach((h, i) => {
+      const flat = normalizeLandmarks(results.landmarks[i]).flatMap(lm => [lm.x, lm.y, lm.z]);
+      if (h[0].categoryName === "Left") left = flat;
+      else right = flat;
+    });
+    if (left && right) return [...left, ...right];
+  }
+  return [];
+}
+
+export const predictFromVideo = (video: HTMLVideoElement, handLandmarker: HandLandmarker, data1Hand: any[], data2Hand: any[],data2HandRelate:any[]): string => {
   const results = handLandmarker.detectForVideo(video, performance.now());
   if (results.landmarks) {
-    let text = classify(3, results, data1Hand, data2Hand);
+    let text = classify(3, results, data1Hand, data2Hand,data2HandRelate);
     if (text.includes("searching") || text.includes("need")) {
-      text = classify(2, results, data1Hand, data2Hand);
+      text = classify(2, results, data2Hand, data2Hand,data2HandRelate);
     }
     if (text.includes("searching") || text.includes("need")) {
-      text = classify(1, results, data1Hand, data2Hand);
+      text = classify(1, results, data1Hand, data2Hand,data2HandRelate);
     }
     return text;
   }
