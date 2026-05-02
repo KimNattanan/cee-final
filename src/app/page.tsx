@@ -27,6 +27,9 @@ export default function Home() {
       <Link href="/webcam">
         <Button>Webcam</Button>
       </Link>
+      <Link href="/record">
+        <Button>record</Button>
+      </Link>
       <PeerSearch />
     </div>
   );

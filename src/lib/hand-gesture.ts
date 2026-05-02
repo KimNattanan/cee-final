@@ -2,8 +2,7 @@ import { HandLandmarker, FilesetResolver, HandLandmarkerResult, NormalizedLandma
 
 const HANDS_OUTPUT_DIR = '/hand_gesture_detection';
 const THRESHOLD_1_HAND = 4.0;
-const THRESHOLD_2_HAND = 0.8;
-const MOVE_THRESHOLD = 0.1
+const THRESHOLD_2_HAND = 8.0;
 
 function apiBase() {
   return (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
@@ -127,7 +126,7 @@ function classify(handMode: number, results: HandLandmarkerResult, data1Hand: an
       if (h[0].categoryName === "Left") left = flat;
       else right = flat;
     });
-    if (left && right) return findNearest([...left, ...right], data2Hand, THRESHOLD_2_HAND);
+    if (left && right) return findNearest([...left, ...right], data2HandRelate, THRESHOLD_2_HAND);
     return "need both hands";
   }
 }
@@ -136,13 +135,15 @@ function findNearest(record: number[], dataset: any[], threshold: number): strin
   let nearestDist = threshold;
   let label = "unknown";
   for (const entry of dataset) {
-    let dist = 0;
-    for (let i = 0; i < entry.coords.length; i++) {
-      dist += Math.pow(entry.coords[i] - record[i], 2);
-    }
-    if (dist < nearestDist) {
-      nearestDist = dist;
-      label = entry.label;
+    for (const landmark of entry.landmark){
+      let dist = 0;
+      for (let i = 0; i < landmark.length; i++) {
+        dist += Math.pow(landmark[i] - record[i], 2);
+      }
+      if (dist < nearestDist) {
+        nearestDist = dist;
+        label = entry.gestureName;
+      }
     }
   }
   return label;
@@ -178,10 +179,10 @@ export const predictFromVideo = (video: HTMLVideoElement, handLandmarker: HandLa
   const results = handLandmarker.detectForVideo(video, performance.now());
   if (results.landmarks) {
     let text = classify(3, results, data1Hand, data2Hand,data2HandRelate);
-    if (text.includes("searching") || text.includes("need")) {
+    if (text.includes("searching") || text.includes("need") || text.includes("unknown")) {
       text = classify(2, results, data2Hand, data2Hand,data2HandRelate);
     }
-    if (text.includes("searching") || text.includes("need")) {
+    if (text.includes("searching") || text.includes("need") || text.includes("unknown")) {
       text = classify(1, results, data1Hand, data2Hand,data2HandRelate);
     }
     return text;

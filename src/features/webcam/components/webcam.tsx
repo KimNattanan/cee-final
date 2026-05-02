@@ -48,9 +48,10 @@ export const Webcam = ({
 
   useEffect(() => {
     const loadData = async () => {
-      const { data1Hand, data2Hand } = await handGesture.loadData();
+      const { data1Hand, data2Hand,data2HandRelate } = await handGesture.loadData();
       setData1Hand(data1Hand);
       setData2Hand(data2Hand);
+      setData2HandRelate(data2HandRelate)
       const handLandmarker = await handGesture.initMediaPipe();
       setHandLandmarker(handLandmarker);
     }
@@ -85,15 +86,16 @@ export const Webcam = ({
 
     const tick = () => {
       const lm = handLandmarkerRef.current;
-      const d1 = data1HandRef.current;
-      const d2 = data2HandRef.current;
-      const d3 = data2HandRelateRef.current;
-
+      const d1 = data1HandRef.current || [];
+      const d2 = data2HandRef.current || [];
+      const d3 = data2HandRelateRef.current || [];
+      
       if (
         video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA &&
         lm &&
-        d1.length > 0 &&
-        d2.length > 0
+        d1.length >= 0 &&
+        d2.length >= 0 && 
+        d3.length >= 0
       ) {
         const next = handGesture.predictFromVideo(video, lm, d1, d2,d3);
         setPrediction((prev) => (prev === next ? prev : next));

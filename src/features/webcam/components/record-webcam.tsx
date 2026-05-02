@@ -109,10 +109,10 @@ export const Webcam = ({
                     setData1Hand([...data1Hand,json.data])
                 }
                 else if(newHandgestureSelected==="2"){
-                    setData1Hand([...data2Hand,json.data])
+                    setData2Hand([...data2Hand,json.data])
                 }
                 else if(newHandgestureSelected==="3"){
-                    setData1Hand([...data2HandRelate,json.data])
+                    setData2HandRelate([...data2HandRelate,json.data])
                 }
             }
         }
@@ -228,7 +228,7 @@ export const Webcam = ({
                 gestureName:d.gestureName,
                 gestureText:d.gestureText
             }) });}}>update</button>
-            <button style={{backgroundColor: currentselect.id === d.id ? 'lightblue' : 'red'}} onClick={()=>{setcurrentselect(d)}}>select</button>
+            <button style={{backgroundColor: (currentselect && currentselect.id === d.id) ? 'lightblue' : 'red'}} onClick={()=>{console.log(currentselect);setcurrentselect(d)}}>select</button>
         </div>
       ))}
       <h2>2 hand Relate</h2>
@@ -251,8 +251,8 @@ export const Webcam = ({
                 gestureName:d.gestureName,
                 gestureText:d.gestureText
             }) });}}>update</button>
-            <button style={{backgroundColor: currentselect.id === d.id ? 'lightblue' : 'red'}} onClick={()=>{if(!recording)setcurrentselect(d)}}>select</button>
-        </div>
+            <button style={{backgroundColor: (currentselect && currentselect.id === d.id) ? 'lightblue' : 'red'}} onClick={()=>{if(!recording)setcurrentselect(d)}}>select</button>
+        </div>  
       ))}
       <input type="number" value={delayRecordTime ? delayRecordTime/1000 : 0} onChange={(e:ChangeEvent<HTMLInputElement>)=>{
                 setDelayRecordTime(parseInt(e.target.value)*1000)
