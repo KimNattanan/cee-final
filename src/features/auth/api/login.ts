@@ -12,6 +12,6 @@ export const loginUser = async (data: LoginUserFormData) => {
     email: data.email,
     password: data.password,
   }
-  const response = await api.post<ApiResponse<void>>("/auth/login", req);
+  const response = await api.post<ApiResponse<undefined>>("/auth/login", req);
   return response;
 };

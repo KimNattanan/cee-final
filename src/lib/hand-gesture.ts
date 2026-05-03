@@ -8,7 +8,7 @@ function apiBase() {
   return (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
 }
 // 1. Load your JSON datasets
-export const loadData = async () => {
+export const loadData = async ():Promise<{ data1Hand: any[], data2Hand: any[],data2HandRelate: any[] }> => {
   const handData:{
     data:[
       {handmode:number}

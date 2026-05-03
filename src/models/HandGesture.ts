@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const HandGestureSchema = new mongoose.Schema({
-    id: { type: String, required: true },
+  id: { type: String, required: true },
   ownerId: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'User',

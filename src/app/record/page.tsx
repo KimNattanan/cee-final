@@ -1,4 +1,4 @@
-import { SelfWebcam } from "@/features/webcam/components/record-webcam";
+import { SelfWebcam } from "@/features/hand/components/record-webcam";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
