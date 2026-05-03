@@ -5,6 +5,7 @@ import { registerUser, RegisterUserFormData } from "../api/register";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import Link from "next/link";
 
 export const RegisterForm = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -30,15 +31,16 @@ export const RegisterForm = () => {
     }
   };
   return (
-    <div>
+    <div className="justify-self-center justify-items-center bg-fuchsia-600/30 backdrop-blur-md rounded-2xl shadow-2xl p-4 px-6">
       <h1>Register Form</h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="flex flex-col items-center gap-4 p-4 placeholder:text-white">
         <Input
           type="text"
           id="username"
           placeholder="Username"
           name="username"
           required
+          className="placeholder:text-white"
         />
         <Input
           type="email"
@@ -46,6 +48,7 @@ export const RegisterForm = () => {
           placeholder="Email"
           name="email"
           required
+          className="placeholder:text-white"
         />
         <Input
           type="password"
@@ -53,6 +56,7 @@ export const RegisterForm = () => {
           placeholder="Password"
           name="password"
           required
+          className="placeholder:text-white"
         />
         <Input
           type="password"
@@ -60,10 +64,12 @@ export const RegisterForm = () => {
           placeholder="Confirm Password"
           name="confirmPassword"
           required
+          className="placeholder:text-white"
         />
         <Button type="submit" disabled={loading}>
           Register
         </Button>
+        <p className="text-xl">Already have an account? <Link href="/login" className="font-bold tex">Login</Link></p>
         {loading && <p>Loading...</p>}
       </form>
     </div>

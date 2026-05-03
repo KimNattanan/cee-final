@@ -16,10 +16,10 @@ export const PeerSearch = () => {
     router.push(`/play/${peerId}`);
   };
   return (
-    <div>
+    <div className="w-[50vw]">
       <h2>Peer Video Call</h2>
       <Input type="text" placeholder="Peer ID" value={peerId} onChange={handlePeerIdChange} />
-      <Button onClick={handleCall} disabled={!peerId.trim()}>Call</Button>
+      <Button onClick={handleCall} disabled={!peerId.trim()} className="w-[50vw]">Call</Button>
     </div>
   );
 };

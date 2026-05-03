@@ -21,7 +21,7 @@ export const LogoutButton = () => {
     }
   };
   return (
-    <Button onClick={handleLogout} disabled={loading}>
+    <Button variant={"plant"} onClick={handleLogout} disabled={loading}>
       {loading ? "Logging out..." : "Logout"}
     </Button>
   );

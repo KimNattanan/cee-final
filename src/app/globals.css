@@ -53,18 +53,18 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: oklch(27.685% 0.00003 271.152);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  --muted-foreground: oklch(53.128% 0.00006 271.152);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --ring: oklch(100% 0.00011 271.152);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -84,8 +84,8 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
+  --background: oklch(27.685% 0.00003 271.152);
+  --foreground: oklch(99.394% 0.02222 112.354);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
@@ -101,7 +101,7 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --ring: oklch(28.094% 0.00003 271.152);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -115,6 +115,36 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer utilities {
+
+  @keyframes color-change {
+    0% { background-color: #8a1cff50; }  
+    33% { background-color: #ff5be450; }
+    66% { background-color: #27acff50; }  
+    100% { background-color: #891cff50; } /* back to start */
+  }
+
+  .animate-color-change {
+    animation: color-change 6s ease-in-out infinite;
+  }
+
+  @keyframes text-color-change {
+    0% { color: #891cff; text-shadow: 0 0 15px #891cff80;}  
+    33% { color: #ff5be4; text-shadow: 0 0 15px #ff5be480;}
+    66% { color: #27acff; text-shadow: 0 0 15px #27acff80;}  
+    100% { color: #891cff; text-shadow: 0 0 15px #891cff80;} /* back to start */
+  }
+
+  .text-animate-color-change {
+    animation: text-color-change 3s ease-in-out infinite;
+  }
+
+  .text-shadow-2xl {
+    text-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  }
+  
 }
 
 @layer base {
