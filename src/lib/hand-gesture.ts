@@ -142,7 +142,7 @@ function findNearest(record: number[], dataset: any[], threshold: number): strin
       }
       if (dist < nearestDist) {
         nearestDist = dist;
-        label = entry.gestureName;
+        label = entry.gestureText;
       }
     }
   }
@@ -189,3 +189,5 @@ export const predictFromVideo = (video: HTMLVideoElement, handLandmarker: HandLa
   }
   return "unknown";
 }
+
+export const ANIME_SPELL = "[[anime]]";

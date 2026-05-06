@@ -3,12 +3,12 @@ import { api } from "./api-client";
 import { UserResponse } from "@/features/auth/types/users";
 import { toast } from "sonner";
 
-export async function getUser(): Promise<UserResponse|undefined> {
+export async function getUser(): Promise<UserResponse|null> {
   try {
     const response = await api.get<ApiResponse<UserResponse>>('/users');
-    return response.data;
+    return response.data ?? null;
   } catch (error) {
     toast.error('Failed to fetch user');
-    return undefined;
+    return null;
   }
 }

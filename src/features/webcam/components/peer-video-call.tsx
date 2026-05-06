@@ -43,13 +43,20 @@ export function PeerVideoCall({ peerId }: { peerId: string }) {
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
   const socketRef = useRef<Socket | null>(null);
-  /** Partner's chosen preview URLs keyed by gesture label (from `webrtc:gesture-preview`). */
-  const [peerPreviewByPrediction, setPeerPreviewByPrediction] = useState<
-    Record<string, string>
-  >({});
+  const dataChannelRef = useRef<RTCDataChannel | null>(null);
+  const latestGestureRef = useRef<{ prediction: string; imageUrl: string } | null>(
+    null,
+  );
+  const [peerGesturePreview, setPeerGesturePreview] = useState<{
+    prediction: string;
+    imageUrl: string;
+  } | null>(null);
 
   const emitGesturePreview = useCallback((prediction: string, imageUrl: string) => {
-    socketRef.current?.emit("webrtc:gesture-preview", { prediction, imageUrl });
+    latestGestureRef.current = { prediction, imageUrl };
+    const channel = dataChannelRef.current;
+    if (!channel || channel.readyState !== "open") return;
+    channel.send(JSON.stringify({ type: "gesture-preview", prediction, imageUrl }));
   }, []);
 
   useEffect(() => {
@@ -63,6 +70,47 @@ export function PeerVideoCall({ peerId }: { peerId: string }) {
     let processedOffer = false;
     let processedAnswer = false;
     let rtcStarted = false;
+    let dataChannel: RTCDataChannel | null = null;
+
+    const bindDataChannel = (ch: RTCDataChannel) => {
+      dataChannel = ch;
+      dataChannelRef.current = ch;
+
+      ch.onopen = () => {
+        const latest = latestGestureRef.current;
+        if (!latest) return;
+        ch.send(
+          JSON.stringify({
+            type: "gesture-preview",
+            prediction: latest.prediction,
+            imageUrl: latest.imageUrl,
+          }),
+        );
+      };
+
+      ch.onmessage = (ev) => {
+        if (cancelled) return;
+        try {
+          const parsed = JSON.parse(ev.data as string) as {
+            type?: string;
+            prediction?: string;
+            imageUrl?: string;
+          };
+          if (
+            parsed.type !== "gesture-preview" ||
+            typeof parsed.prediction !== "string" ||
+            typeof parsed.imageUrl !== "string"
+          ) {
+            return;
+          }
+          const prediction = parsed.prediction;
+          const imageUrl = parsed.imageUrl;
+          setPeerGesturePreview({ prediction, imageUrl });
+        } catch {
+          // Ignore malformed data-channel messages.
+        }
+      };
+    };
 
     async function flushIceBuffer() {
       if (!pc?.remoteDescription) return;
@@ -152,6 +200,13 @@ export function PeerVideoCall({ peerId }: { peerId: string }) {
       setLocalStream(local);
 
       pc = new RTCPeerConnection(ICE_SERVERS);
+      if (amCaller) {
+        bindDataChannel(pc.createDataChannel("gesture-preview"));
+      } else {
+        pc.ondatachannel = (event) => {
+          bindDataChannel(event.channel);
+        };
+      }
 
       pc.ontrack = (ev) => {
         if (cancelled) return;
@@ -233,29 +288,6 @@ export function PeerVideoCall({ peerId }: { peerId: string }) {
 
       socketRef.current = socket;
 
-      socket.on(
-        "webrtc:gesture-preview",
-        (msg: {
-          fromUserId?: string;
-          prediction?: string;
-          imageUrl?: string;
-        }) => {
-          if (cancelled) return;
-          if (
-            typeof msg.fromUserId !== "string" ||
-            msg.fromUserId !== peerId ||
-            typeof msg.prediction !== "string" ||
-            typeof msg.imageUrl !== "string"
-          ) {
-            return;
-          }
-          setPeerPreviewByPrediction((prev) => ({
-            ...prev,
-            [msg.prediction!]: msg.imageUrl!,
-          }));
-        },
-      );
-
       socket.on("webrtc:signal", (msg: { type: string; payload: unknown }) => {
         if (cancelled) return;
         if (!pc) {
@@ -291,7 +323,10 @@ export function PeerVideoCall({ peerId }: { peerId: string }) {
     return () => {
       cancelled = true;
       socketRef.current = null;
-      setPeerPreviewByPrediction({});
+      dataChannelRef.current = null;
+      latestGestureRef.current = null;
+      setPeerGesturePreview(null);
+      dataChannel?.close();
       socket?.removeAllListeners();
       socket?.disconnect();
       pc?.close();
@@ -338,7 +373,9 @@ export function PeerVideoCall({ peerId }: { peerId: string }) {
                 username="Peer"
                 email={`id: ${peerId}`}
                 muted={false}
-                peerChosenImages={peerPreviewByPrediction}
+                predictEnabled={false}
+                remotePrediction={peerGesturePreview?.prediction}
+                remoteImageUrl={peerGesturePreview?.imageUrl}
               />
             ) : (
               <div className="text-sm text-muted-foreground">

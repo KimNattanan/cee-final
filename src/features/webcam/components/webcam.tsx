@@ -14,8 +14,10 @@ export const Webcam = ({
   username,
   email,
   muted = true,
-  /** URLs chosen by the person in this feed (from signaling); preferred when prediction matches. */
-  peerChosenImages,
+  /** Disable local prediction and render externally supplied prediction/image instead. */
+  predictEnabled = true,
+  remotePrediction,
+  remoteImageUrl,
   /** After resolving an image for this feed, publish so the call partner can reuse it. */
   onPredictionImageReady,
 }: {
@@ -24,7 +26,9 @@ export const Webcam = ({
   username: string;
   email: string;
   muted?: boolean;
-  peerChosenImages?: Record<string, string>;
+  predictEnabled?: boolean;
+  remotePrediction?: string;
+  remoteImageUrl?: string;
   onPredictionImageReady?: (prediction: string, imageUrl: string) => void;
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -47,6 +51,7 @@ export const Webcam = ({
   data2HandRelateRef.current = data2HandRelate;
 
   useEffect(() => {
+    if (!predictEnabled) return;
     const loadData = async () => {
       const { data1Hand, data2Hand,data2HandRelate } = await handGesture.loadData();
       setData1Hand(data1Hand);
@@ -56,25 +61,37 @@ export const Webcam = ({
       setHandLandmarker(handLandmarker);
     }
     loadData();
-  }, []);
+  }, [predictEnabled]);
+
+  const effectivePrediction = predictEnabled
+    ? prediction
+    : (remotePrediction ?? "searching...");
 
   const showLoremPreview =
-    prediction !== "loading..." &&
-    prediction !== "unknown" &&
-    prediction !== "need both hands" &&
-    prediction !== "searching...";
+    effectivePrediction !== "loading..." &&
+    effectivePrediction !== "unknown" &&
+    effectivePrediction !== "need both hands" &&
+    effectivePrediction !== "searching...";
 
   useEffect(() => {
+    if (!predictEnabled) return;
     if (showLoremPreview) {
       setLoremCacheBust((n) => n + 1);
-      setImageUrl("");
       (async () => {
-        const url = await randomImageUrl(prediction);
-        setImageUrl(url);
-        onPredictionImageReady?.(prediction, url);
+        if(prediction === handGesture.ANIME_SPELL){
+          const url = await randomImageUrl();
+          setImageUrl(url);
+          onPredictionImageReady?.(handGesture.ANIME_SPELL, url);
+        } else {
+          setImageUrl("");
+          onPredictionImageReady?.(prediction, "");
+        }
       })();
+    } else {
+      setImageUrl("");
+      onPredictionImageReady?.(prediction, "");
     }
-  }, [prediction, showLoremPreview, onPredictionImageReady]);
+  }, [prediction, showLoremPreview, onPredictionImageReady, predictEnabled]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -83,6 +100,12 @@ export const Webcam = ({
     video.srcObject = videoStream;
 
     let frameHandle = 0;
+
+    if (!predictEnabled) {
+      return () => {
+        video.srcObject = null;
+      };
+    }
 
     const tick = () => {
       const lm = handLandmarkerRef.current;
@@ -124,33 +147,52 @@ export const Webcam = ({
       }
       video.srcObject = null;
     };
-  }, [videoStream]);
+  }, [videoStream, predictEnabled]);
 
   const displayImageUrl =
-    peerChosenImages?.[prediction] ?? imageUrl;
+    predictEnabled ? imageUrl : (remoteImageUrl ?? "");
 
   return (
-    <div>
-      <div>{username} ({email})</div>
+    <div className="flex">
       <div>
-        <video
-          ref={videoRef}
-          width={320}
-          height={240}
-          autoPlay
-          playsInline
-          muted={muted}
-          style={{ transform: 'scaleX(-1)' }}
-        />
+        <div>{username} ({email})</div>
+        <div>
+          <video
+            ref={videoRef}
+            width={320}
+            height={240}
+            autoPlay
+            playsInline
+            muted={muted}
+            style={{ transform: 'scaleX(-1)' }}
+          />
+        </div>
       </div>
-      <div>Prediction: {prediction}</div>
       {showLoremPreview && displayImageUrl && displayImageUrl.length > 0 && (
-        <div className="border rounded-2xl p-2 border-rose-400 w-fit">
+        <div className="relative w-[300px] h-[300px] overflow-hidden">
+          <div
+            className="absolute inset-0 animate-spin"
+            style={{
+              backgroundImage: "url('/img/loading.png')",
+              backgroundSize: '30%',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+              animationDirection: 'normal',
+            }}
+          />
           <img
-            key={`${prediction}-${loremCacheBust}-${displayImageUrl.slice(-24)}`}
+            key={`${effectivePrediction}-${loremCacheBust}-${displayImageUrl.slice(-24)}`}
             src={displayImageUrl}
             alt="Prediction"
+            className="relative z-10 w-full h-full object-cover"
           />
+        </div>
+      )}
+      {showLoremPreview && effectivePrediction !== handGesture.ANIME_SPELL && (
+        <div className="content-center ml-4">
+          <div className="bg-white border border-black text-black rounded-lg p-2 max-w-80 break-all">
+            {effectivePrediction}
+          </div>
         </div>
       )}
     </div>
