@@ -7,7 +7,10 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import Link from "next/link";
 
+import { useRouter } from "next/navigation";
+
 export const LoginForm = () => {
+  const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -20,6 +23,8 @@ export const LoginForm = () => {
     try {
       const response = await loginUser(data);
       toast.success(response.message);
+      router.push("/");
+      router.refresh();
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "An unknown error occurred",

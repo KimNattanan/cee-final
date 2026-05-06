@@ -70,16 +70,18 @@ const DataBox = ({
     }
   };
   return (
-    <div>
+    <div className="justify-items-center p-3 border-2 gap-y-3 rounded-2xl my-3">
       <Input type="text" value={gestureName} onChange={handleChangeName} placeholder="name" />
       <Input type="text" value={gestureText} onChange={handleChangeText} placeholder="text" />
-      <Button onClick={handleUpdate} disabled={isUpdating || isDeleting}>Update</Button>
-      <Button onClick={handleDelete} disabled={isUpdating || isDeleting}>Delete</Button>
-      <Button
-        style={{backgroundColor: isSelecting ? 'lightblue' : 'red'}}
-        onClick={handleSelect}
-        disabled={isUpdating || isDeleting}
-      >Select</Button>
+      <div className="flex gap-5">
+        <Button onClick={handleUpdate} disabled={isUpdating || isDeleting}>Update</Button>
+        <Button onClick={handleDelete} disabled={isUpdating || isDeleting}>Delete</Button>
+        <Button
+          style={{backgroundColor: isSelecting ? 'red' : 'gray'}}
+          onClick={handleSelect}
+          disabled={isUpdating || isDeleting}
+        >Select</Button>
+      </div>
     </div>
   )
 }
@@ -228,75 +230,42 @@ export const Webcam = ({
     };
   }, [videoStream]);
   return (
-    <div>
-      <div>{username} ({email})</div>
-      <div>
-        <video
-          ref={videoRef}
-          width={320}
-          height={240}
-          autoPlay
-          playsInline
-          muted={muted}
-          style={{ transform: 'scaleX(-1)' }}
-        />
+    <div className="max-w-full flex flex-col items-center py-5 gap-y-5">
+      <div className="flex w-full px-5 justify-between">
+        <p>Username : {username}</p>
+        <p>Email : {email}</p>
       </div>
-      <Input type="text" value={newHandgestureName} onChange={handleChangename} placeholder="Gesture Name..." />
-      <Input type="text" value={newHandgestureText} onChange={handleChangetext} placeholder="Gesture Text..." />
-      <Select value={newHandgestureSelected} onValueChange={(value:string)=>setNewHandgestureSelected(value)}>
-        <SelectTrigger>
-          <SelectValue placeholder="Select a gesture" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="1">one hand</SelectItem>
-          <SelectItem value="2">two hand</SelectItem>
-          <SelectItem value="3">two hand relate</SelectItem>
-        </SelectContent>
-      </Select>
-      <Button onClick={handleClick} >create new gesture</Button>
-      <h2>1 hand</h2>
-      {data1Hand.map((d) => (
-        <DataBox
-          key={d.id}
-          id={d.id}
-          gestureName={d.gestureName}
-          gestureText={d.gestureText}
-          setData={setData1Hand}
-          handleSelect={()=>handleSelect(d)}
-          isSelecting={currentselect?.id === d.id}
-          invalidateData={invalidateData}
-        />
-      ))}
-      <h2>2 hand</h2>
-      {data2Hand.map((d) => (
-        <DataBox
-          key={d.id}
-          id={d.id}
-          gestureName={d.gestureName}
-          gestureText={d.gestureText}
-          setData={setData2Hand}
-          handleSelect={()=>handleSelect(d)}
-          isSelecting={currentselect?.id === d.id}
-          invalidateData={invalidateData}
-        />
-      ))}
-      <h2>2 hand Relate</h2>
-      {data2HandRelate.map((d) => (
-        <DataBox
-          key={d.id}
-          id={d.id}
-          gestureName={d.gestureName}
-          gestureText={d.gestureText}
-          setData={setData2HandRelate}
-          handleSelect={()=>handleSelect(d)}
-          isSelecting={currentselect?.id === d.id}
-          invalidateData={invalidateData}
-        />
-      ))}
-      <div className="flex">
-        <span>Delay Time: </span>
+      <div className="flex justify-center gap-5">
+        <video
+            ref={videoRef}
+            width={320}
+            height={240}
+            autoPlay
+            playsInline
+            muted={muted}
+            style={{ transform: 'scaleX(-1)' }}
+          />
+          
+        <div className="p-5 flex flex-col gap-5">
+          <Input type="text" value={newHandgestureName} onChange={handleChangename} placeholder="Gesture Name..." />
+          <Input type="text" value={newHandgestureText} onChange={handleChangetext} placeholder="Gesture Text..." />
+          <Select value={newHandgestureSelected} onValueChange={(value:string)=>setNewHandgestureSelected(value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a gesture" />
+            </SelectTrigger>
+            <SelectContent className="bg-transparent">
+              <SelectItem value="1" className="bg-white/60 text-black">one hand</SelectItem>
+              <SelectItem value="2" className="bg-white/60 text-black">two hand</SelectItem>
+              <SelectItem value="3" className="bg-white/60 text-black">two hand relate</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button onClick={handleClick} >create new gesture</Button>
+        </div>
+      </div>
+      <div className="flex gap-5 align-middle">
+        <span>Delay Time : </span>
         <Input
-          className="w-fit"
+          className="min-w-15 w-fit"
           type="number"
           value={delayRecordTime ? delayRecordTime/1000 : 0}
           onChange={(e:ChangeEvent<HTMLInputElement>)=>{
@@ -306,6 +275,53 @@ export const Webcam = ({
         />
         <span>seconds</span>
         <Button onClick={recordHand} disabled={recording || !currentselect}>{recording ? "Recording..." : "Record"}</Button>
+      </div>  
+      <div className="grid grid-cols-3 w-full gap-x-5 px-5">
+        <div className="justify-items-center bg-red-500/40 rounded-2xl p-5 gap-3">
+          <h2>1 hand</h2>
+          {data1Hand.map((d) => (
+            <DataBox
+              key={d.id}
+              id={d.id}
+              gestureName={d.gestureName}
+              gestureText={d.gestureText}
+              setData={setData1Hand}
+              handleSelect={()=>handleSelect(d)}
+              isSelecting={currentselect?.id === d.id}
+              invalidateData={invalidateData}
+            />
+          ))}
+        </div>
+        <div className="justify-items-center bg-blue-500/40 rounded-2xl p-5 gap-3">
+          <h2>2 hand</h2>
+          {data2Hand.map((d) => (
+            <DataBox
+              key={d.id}
+              id={d.id}
+              gestureName={d.gestureName}
+              gestureText={d.gestureText}
+              setData={setData2Hand}
+              handleSelect={()=>handleSelect(d)}
+              isSelecting={currentselect?.id === d.id}
+              invalidateData={invalidateData}
+            />
+          ))}
+        </div>
+        <div className="justify-items-center bg-purple-500/40 rounded-2xl p-5 gap-3">
+          <h2>2 hand Relate</h2>
+          {data2HandRelate.map((d) => (
+            <DataBox
+              key={d.id}
+              id={d.id}
+              gestureName={d.gestureName}
+              gestureText={d.gestureText}
+              setData={setData2HandRelate}
+              handleSelect={()=>handleSelect(d)}
+              isSelecting={currentselect?.id === d.id}
+              invalidateData={invalidateData}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -345,9 +361,13 @@ export const SelfWebcam = () => {
   return (
     <div>
       {mediaStream1 ? (
-        <Webcam videoStream={mediaStream1} userId={user?.userId ?? 'ー'} username={user?.username ?? 'ー'} email={user?.email ?? 'ー'} />
+        <div>
+          <Webcam videoStream={mediaStream1} userId={user?.userId ?? 'ー'} username={user?.username ?? 'ー'} email={user?.email ?? 'ー'} />
+        </div>
       ) : (
-        <div>No webcam found</div>
+        <div className="flex flex-col items-center justify-center min-h-screen">
+          <div>No webcam found</div>
+        </div>
       )}
     </div>
   );

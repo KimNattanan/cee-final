@@ -65,7 +65,7 @@ async function fetchApi<T>(
   }
 
   const fullUrl = buildUrlWithParams(`${process.env.NEXT_PUBLIC_API_URL}${url}`, params);
-
+  console.log(fullUrl);
   const response = await fetch(fullUrl, {
     method,
     headers: {

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { logoutUser } from "../api/logout";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { router } from "next/client";
 
 export const LogoutButton = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -12,6 +13,7 @@ export const LogoutButton = () => {
     try {
       const response = await logoutUser();
       toast.success(response.message);
+      window.location.reload();
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "An unknown error occurred",
