@@ -152,49 +152,60 @@ export const Webcam = ({
   const displayImageUrl =
     predictEnabled ? imageUrl : (remoteImageUrl ?? "");
 
+  const shouldSwap = muted === false;
+
   return (
-    <div className="flex">
-      <div>
-        <div>{username} ({email})</div>
-        <div>
-          <video
-            ref={videoRef}
-            width={320}
-            height={240}
-            autoPlay
-            playsInline
-            muted={muted}
-            style={{ transform: 'scaleX(-1)' }}
-          />
-        </div>
+    <div className="w-full h-full py-3">
+      <div className="w-full px-5 flex justify-between">
+          <p>Username : {username}</p>
+          <p>Email : {email}</p>
       </div>
-      {showLoremPreview && displayImageUrl && displayImageUrl.length > 0 && (
-        <div className="relative w-[300px] h-[300px] overflow-hidden">
-          <div
-            className="absolute inset-0 animate-spin"
-            style={{
-              backgroundImage: "url('/img/loading.png')",
-              backgroundSize: '30%',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-              animationDirection: 'normal',
-            }}
-          />
-          <img
-            key={`${effectivePrediction}-${loremCacheBust}-${displayImageUrl.slice(-24)}`}
-            src={displayImageUrl}
-            alt="Prediction"
-            className="relative z-10 w-full h-full object-cover"
-          />
+      <div className="grid grid-cols-2 gap-5 py-3 h-full" dir={shouldSwap ? "rtl" : "ltr"}>
+        <div className="justify-center items-center flex h-full">
+          <video
+              ref={videoRef}
+              width={320}
+              height={240}
+              autoPlay
+              playsInline
+              muted={muted}
+              style={{ transform: 'scaleX(-1)' }}
+            />
         </div>
-      )}
-      {showLoremPreview && effectivePrediction !== handGesture.ANIME_SPELL && (
-        <div className="content-center ml-4">
-          <div className="bg-white border border-black text-black rounded-lg p-2 max-w-80 break-all">
-            {effectivePrediction}
+        <div className="relative w-full h-full align-middle justify-items-center">
+          <div className="absolute z-10 align-middle h-full">
+            {showLoremPreview && displayImageUrl && displayImageUrl.length > 0 && (
+              <div className="relative w-full h-full bg-primary/50 flex items-center justify-center overflow-hidden">
+                <div
+                  className="absolute inset-0 animate-spin w-full h-full"
+                  style={{
+                    backgroundImage: "url('/img/loading.png')",
+                    backgroundSize: 'clamp(20px, 30%, 80px)',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                    animationDirection: 'normal',
+                  }}
+                />
+                <img
+                  key={`${effectivePrediction}-${loremCacheBust}-${displayImageUrl.slice(-24)}`}
+                  src={displayImageUrl}
+                  alt="Prediction"
+                  className="relative z-20 object-cover max-h-full w-auto"
+                />
+              </div>
+            )}
+          </div>
+          <div className="w-full h-full align-middle">
+            {showLoremPreview && effectivePrediction !== handGesture.ANIME_SPELL && (
+              <div className="content-center align-middle w-full h-full">
+                <div className="bg-white border border-black text-black rounded-lg max-w-full min-w-60 break-all justify-items-center align-middle">
+                  <p>{effectivePrediction}</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };
@@ -235,7 +246,9 @@ export const SelfWebcam = () => {
       {mediaStream1 ? (
         <Webcam videoStream={mediaStream1} userId={user?.userId ?? 'ー'} username={user?.username ?? 'ー'} email={user?.email ?? 'ー'} />
       ) : (
-        <div>No webcam found</div>
+        <div className="flex flex-col items-center justify-center min-h-screen">
+          <div>No webcam found</div>
+        </div>
       )}
     </div>
   );

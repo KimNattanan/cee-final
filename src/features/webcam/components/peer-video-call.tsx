@@ -337,56 +337,62 @@ export function PeerVideoCall({ peerId }: { peerId: string }) {
   }, [peerId]);
 
   return (
-    <div className="flex flex-col gap-4 p-4">
-      <div className="text-sm text-muted-foreground">
+    <div className="flex flex-col w-full gap-4 p-4 ">
+      <div className="text-sm text-muted-foreground shrink-0 w-full">
         <div>
-          Calling user id: <code className="text-foreground">{peerId}</code>
+          Calling user id: <code className="text-primary">{peerId}</code>
         </div>
         <div className="mt-1">{statusNote}</div>
       </div>
+      <div className="h-full">
+        {phase === "unauthorized" || phase === "error" ? null : (
+          <div className="grid gap-6 md:grid-cols-2 flex-1 min-h-0 h-full">
+            <section className="flex flex-col min-h-0 w-full justify-items-center">
+              <p className="mb-2 text-2xl text-blue-800 font-bold shrink-0 bg-blue-500/50 rounded-2xl text-center">You</p>
+              <div className="flex-1 h-full bg-blue-800/20 rounded-xl">
+                {localStream && self ? (
+                  <Webcam
+                    videoStream={localStream}
+                    userId={self.userId}
+                    username={self.username}
+                    email={self.email}
+                    muted
+                    onPredictionImageReady={emitGesturePreview}
+                  />
+                ) : (
+                  <div className="text-sm text-muted-foreground flex justify-center">
+                    {phase === "waiting-peer" ? "Camera starts after peer joins." : "…"}
+                  </div>
+                )}
+              </div>
+            </section>
 
-      {phase === "unauthorized" || phase === "error" ? null : (
-        <div className="grid gap-6 md:grid-cols-2">
-          <section>
-            <p className="mb-2 text-sm font-medium">You</p>
-            {localStream && self ? (
-              <Webcam
-                videoStream={localStream}
-                userId={self.userId}
-                username={self.username}
-                email={self.email}
-                muted
-                onPredictionImageReady={emitGesturePreview}
-              />
-            ) : (
-              <div className="text-sm text-muted-foreground">
-                {phase === "waiting-peer" ? "Camera starts after peer joins." : "…"}
+            <section className="flex flex-col min-h-0">
+              <p className="mb-2 text-2xl text-red-800 font-bold shrink-0 bg-red-500/50 rounded-2xl text-center">Peer</p>
+              <div className="flex-1 min-h-0 h-full bg-red-800/20 rounded-xl">
+                {remoteStream && self ? (
+                  <Webcam
+                    videoStream={remoteStream}
+                    userId={peerId}
+                    username="Peer"
+                    email={`id: ${peerId}`}
+                    muted={false}
+                    predictEnabled={false}
+                    remotePrediction={peerGesturePreview?.prediction}
+                    remoteImageUrl={peerGesturePreview?.imageUrl}
+                  />
+                ) : (
+                  <div className="text-sm text-muted-foreground flex justify-center">
+                    {phase === "waiting-peer"
+                      ? "Waiting…"
+                      : "Remote video appears when the connection is ready."}
+                  </div>
+                )}
               </div>
-            )}
-          </section>
-          <section>
-            <p className="mb-2 text-sm font-medium">Peer</p>
-            {remoteStream && self ? (
-              <Webcam
-                videoStream={remoteStream}
-                userId={peerId}
-                username="Peer"
-                email={`id: ${peerId}`}
-                muted={false}
-                predictEnabled={false}
-                remotePrediction={peerGesturePreview?.prediction}
-                remoteImageUrl={peerGesturePreview?.imageUrl}
-              />
-            ) : (
-              <div className="text-sm text-muted-foreground">
-                {phase === "waiting-peer"
-                  ? "Waiting…"
-                  : "Remote video appears when the connection is ready."}
-              </div>
-            )}
-          </section>
-        </div>
-      )}
+            </section>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

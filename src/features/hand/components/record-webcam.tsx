@@ -249,6 +249,7 @@ export const Webcam = ({
         <div className="p-5 flex flex-col gap-5">
           <Input type="text" value={newHandgestureName} onChange={handleChangename} placeholder="Gesture Name..." />
           <Input type="text" value={newHandgestureText} onChange={handleChangetext} placeholder="Gesture Text..." />
+          <p className="text-xs">Gesture Text = "[[anime]]" for Anime Gesture</p>
           <Select value={newHandgestureSelected} onValueChange={(value:string)=>setNewHandgestureSelected(value)}>
             <SelectTrigger>
               <SelectValue placeholder="Select a gesture" />
@@ -361,9 +362,7 @@ export const SelfWebcam = () => {
   return (
     <div>
       {mediaStream1 ? (
-        <div>
-          <Webcam videoStream={mediaStream1} userId={user?.userId ?? 'ー'} username={user?.username ?? 'ー'} email={user?.email ?? 'ー'} />
-        </div>
+        <Webcam videoStream={mediaStream1} userId={user?.userId ?? 'ー'} username={user?.username ?? 'ー'} email={user?.email ?? 'ー'} />
       ) : (
         <div className="flex flex-col items-center justify-center min-h-screen">
           <div>No webcam found</div>

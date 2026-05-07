@@ -11,11 +11,15 @@ export default async function PlayPage({
   const decoded = decodeURIComponent(peerId);
 
   return (
-    <div className="flex flex-col gap-4 p-4">
-      <Link href="/">
-        <Button variant="outline">Home</Button>
-      </Link>
-      <PeerVideoCall peerId={decoded} />
+    <div className="w-screen min-h-screen bg-[url('/img/background_1.jpg')] bg-cover bg-fixed bg-center bg-no-repeat">
+      <div className="w-full min-h-screen flex flex-col gap-4 p-4">
+        <Link href="/">
+          <Button variant="outline">Home</Button>
+        </Link>
+        <div className="flex-1 min-h-0 flex justify-center bg-amber-50/90 rounded-2xl overflow-hidden">
+          <PeerVideoCall peerId={decoded} />
+        </div>
+      </div>
     </div>
   );
 }

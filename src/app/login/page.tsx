@@ -4,8 +4,8 @@ import Link from "next/link";
 
 export default function Login() {
   return (
-    <div className="w-screen h-screen bg-[url('/img/background_2.jpg')] bg-cover bg-center bg-no-repeat">
-      <div className="w-screen h-screen space-y-5 bg-linear-to-bl from-blue-400/50 via-fuchsia-500/50 to-pink-500/50 text-cyan-50 text-3xl flex flex-col">
+    <div className="w-screen min-h-screen bg-[url('/img/background_2.jpg')] bg-cover bg-center bg-no-repeat">
+      <div className="w-screen min-h-screen space-y-5 bg-linear-to-bl from-blue-400/50 via-fuchsia-500/50 to-pink-500/50 text-cyan-50 text-3xl flex flex-col">
         <div className="w-screen p-5">
           <h1 className="text-amber-50/90 text-4xl font-extrabold justify-self-center">Login</h1>
           <Link href="/">
