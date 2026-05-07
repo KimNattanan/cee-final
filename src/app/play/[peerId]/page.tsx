@@ -28,7 +28,6 @@ export default async function PlayPage({
             <PeerVideoCall peerId={decoded} />
           </div>
         </div>
-
       </div>
     </div>
   );

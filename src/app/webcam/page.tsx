@@ -23,12 +23,8 @@ export default function Webcam() {
               <SelfWebcam />
             </div>
           </div>
-        </div>
-
-        <div className="h-10 md:h-16" />
-        
+        </div>        
       </div>
     </div>
-    
   );
 }

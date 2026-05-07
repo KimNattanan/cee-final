@@ -22,8 +22,6 @@ export default function Record() {
             <SelfWebcam />
           </div>
         </div>
-
-        <div className="h-4 sm:h-8" />
       </div>
     </div>
   );

@@ -17,13 +17,12 @@ export default function Login() {
           </h1>
         </div>
 
-      <div className="flex flex-1 items-center justify-center p-2 sm:p-10">
-        <div className="w-full max-w-md lg:max-w-lg">
-          <LoginForm />
+        <div className="flex flex-1 items-center justify-center p-2 sm:p-10">
+          <div className="w-full max-w-md lg:max-w-lg">
+            <LoginForm />
+          </div>
         </div>
-      </div>
+    </div>
   </div>
-</div>
-    
   );
 }
