@@ -160,8 +160,8 @@ export const Webcam = ({
           <p>Username : {username}</p>
           <p>Email : {email}</p>
       </div>
-      <div className="grid grid-cols-2 gap-5 py-3 h-full" dir={shouldSwap ? "rtl" : "ltr"}>
-        <div className="justify-center items-center flex h-full">
+       <div className="grid grid-cols-2 gap-5 py-3 h-full">
+        <div className={`justify-center items-center flex h-full ${shouldSwap ? "order-2" : "order-1"}`}>
           <video
               ref={videoRef}
               width={320}
@@ -172,7 +172,7 @@ export const Webcam = ({
               style={{ transform: 'scaleX(-1)' }}
             />
         </div>
-        <div className="relative w-full h-full align-middle justify-items-center">
+        <div className={`relative w-full h-full align-middle justify-items-center ${shouldSwap ? "order-1" : "order-2"}`}>
           <div className="absolute z-10 align-middle h-full">
             {showLoremPreview && displayImageUrl && displayImageUrl.length > 0 && (
               <div className="relative w-full h-full bg-primary/50 flex items-center justify-center overflow-hidden">
