@@ -6,6 +6,7 @@ A full-stack web application that combines **account-based access**, **real-time
 
 - **Authentication** — Register and sign in with credentials stored in MongoDB; sessions use signed JWTs delivered via HTTP-only cookies.
 - **Solo webcam** — Local camera feed with continuous hand tracking and gesture-based preview images.
+- **Custom gesture recording** — `/record` lets each user create, update, delete, and record their own gesture templates (1-hand, 2-hand, and 2-hand-relate) stored in MongoDB.
 - **Peer video calls** — WebRTC (camera + microphone) with Socket.IO signaling on the same process as the Next.js app; canonical rooms pair two authenticated users.
 - **Gesture sync** — Each caller publishes their chosen preview URL over the signaling channel so the remote participant can reuse the same image when the predicted label matches.
 
@@ -54,6 +55,7 @@ Gesture reference data and model assets are loaded from `public/hand_gesture_det
 
    - Create an account and log in.
    - Open **Webcam** for single-user gesture preview.
+   - Open **`/record`** to add custom gestures and capture landmark samples for your account.
    - Start a call by opening **`/play/<peer-user-id>`** so both users join the same signaling room (each uses the other’s user id in the URL).
 
 ## Environment variables
