@@ -74,7 +74,7 @@ Never commit `.env` or real secrets.
 
 - **Single process** — HTTP serves Next; Socket.IO attaches to the same server so cookies used for REST auth match signaling connections.
 - **WebRTC** — STUN is configured in the client (`stun:stun.l.google.com:19302`). Production deployments often add TURN for restrictive networks.
-- **Gesture pipeline** — Video frames drive `detectForVideo`; landmarks are compared to JSON datasets under `public/hand_gesture_detection/`. Preview images are fetched from an external API (see `src/lib/random-image.ts`); failures fall back to a local placeholder.
+- **Gesture pipeline** — Video frames drive `detectForVideo`; landmarks are compared to JSON datasets under `public/hand_gesture_detection/`. When the `ANIME_SPELL` gesture is detected, preview images are fetched from `https://api.nekosia.cat/api/v1/images/random` (see `src/lib/random-image.ts`); failures fall back to `/img/note_pc_error.png`.
 
 ## Contributing and support
 
