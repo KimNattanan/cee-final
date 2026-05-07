@@ -155,55 +155,48 @@ export const Webcam = ({
   const shouldSwap = muted === false;
 
   return (
-    <div className="w-full h-full py-3">
-      <div className="w-full px-5 flex justify-between">
-          <p>Username : {username}</p>
-          <p>Email : {email}</p>
+    <div className="flex w-full h-full flex-col py-2 gap-y-2">
+      <div className="w-full px-2 flex justify-between gap-2 text-[10px] sm:text-xs md:text-sm opacity-70">
+        <p className="truncate">{username}</p>
+        <p className="truncate">{email}</p>
       </div>
-       <div className="grid grid-cols-2 gap-5 py-3 h-full">
-        <div className={`justify-center items-center flex h-full ${shouldSwap ? "order-2" : "order-1"}`}>
+
+      <div className="grid grid-cols-2 gap-2 sm:gap-4 flex-1 min-h-0 items-stretch">
+        
+        <div className={`relative self-center flex justify-center items-center bg-black/5 rounded-lg overflow-hidden border border-black/5 h-fit md:aspect-video ${shouldSwap ? "order-2" : "order-1"}`}>
           <video
-              ref={videoRef}
-              width={320}
-              height={240}
-              autoPlay
-              playsInline
-              muted={muted}
-              style={{ transform: 'scaleX(-1)' }}
-            />
+            ref={videoRef}
+            className="w-full h-full object-cover"
+            autoPlay
+            playsInline
+            muted={muted}
+            style={{ transform: 'scaleX(-1)' }}
+          />
         </div>
-        <div className={`relative w-full h-full align-middle justify-items-center ${shouldSwap ? "order-1" : "order-2"}`}>
-          <div className="absolute z-10 align-middle h-full">
-            {showLoremPreview && displayImageUrl && displayImageUrl.length > 0 && (
-              <div className="relative w-full h-full bg-primary/50 flex items-center justify-center overflow-hidden">
-                <div
-                  className="absolute inset-0 animate-spin w-full h-full"
-                  style={{
-                    backgroundImage: "url('/img/loading.png')",
-                    backgroundSize: 'clamp(20px, 30%, 80px)',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat',
-                    animationDirection: 'normal',
-                  }}
-                />
-                <img
-                  key={`${effectivePrediction}-${loremCacheBust}-${displayImageUrl.slice(-24)}`}
-                  src={displayImageUrl}
-                  alt="Prediction"
-                  className="relative z-20 object-cover max-h-full w-auto"
-                />
-              </div>
-            )}
-          </div>
-          <div className="w-full h-full align-middle">
+
+        <div className={`relative flex flex-col items-center justify-center bg-black/5 rounded-lg overflow-hidden border border-black/5 flex-1 ${shouldSwap ? "order-1" : "order-2"}`}>
+          
+          {showLoremPreview && displayImageUrl && displayImageUrl.length > 0 && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-primary/10 backdrop-blur-[2px]">
+              <img
+                key={`${effectivePrediction}-${loremCacheBust}-${displayImageUrl.slice(-24)}`}
+                src={displayImageUrl}
+                alt="Prediction"
+                className="object-contain max-h-[95%] w-full p-1"
+              />
+            </div>
+          )}
+
+          <div className="absolute left-0 right-0 z-30 flex items-center justify-center px-1 pointer-events-none">
             {showLoremPreview && effectivePrediction !== handGesture.ANIME_SPELL && (
-              <div className="content-center align-middle w-full h-full">
-                <div className="bg-white border border-black text-black rounded-lg max-w-full min-w-60 break-all justify-items-center align-middle">
-                  <p>{effectivePrediction}</p>
-                </div>
+              <div className="bg-white/95 border border-black text-black rounded px-1.5 py-0.5 max-w-[95%] shadow-md pointer-events-auto flex items-center justify-center">
+                <p className="text-[16px] sm:text-xl md:text-2xl font-mono font-bold uppercase tracking-tighter truncate text-center w-full">
+                  {effectivePrediction}
+                </p>
               </div>
             )}
           </div>
+          
         </div>
       </div>
     </div>

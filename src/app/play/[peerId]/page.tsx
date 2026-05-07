@@ -11,14 +11,24 @@ export default async function PlayPage({
   const decoded = decodeURIComponent(peerId);
 
   return (
-    <div className="w-screen min-h-screen bg-[url('/img/background_1.jpg')] bg-cover bg-fixed bg-center bg-no-repeat">
-      <div className="w-full min-h-screen flex flex-col gap-4 p-4">
-        <Link href="/">
-          <Button variant="outline">Home</Button>
-        </Link>
-        <div className="flex-1 min-h-0 flex justify-center bg-amber-50/90 rounded-2xl overflow-hidden">
-          <PeerVideoCall peerId={decoded} />
+    <div className="relative min-h-screen w-full bg-[url('/img/background_1.jpg')] bg-cover bg-fixed bg-center bg-no-repeat">
+      
+      <div className="grid grid-rows-[auto_1fr] min-h-screen w-full gap-4 p-4 md:p-6 lg:p-8">
+        
+        <div className="z-10 flex w-full justify-start">
+          <Link href="/">
+            <Button variant="outline" className="bg-white/20 backdrop-blur-sm hover:bg-white/40">
+              Home
+            </Button>
+          </Link>
         </div>
+
+        <div className="relative w-full h-full flex flex-col bg-amber-50/90 rounded-2xl shadow-2xl border border-white/20">
+          <div className="w-full flex-1">
+            <PeerVideoCall peerId={decoded} />
+          </div>
+        </div>
+
       </div>
     </div>
   );

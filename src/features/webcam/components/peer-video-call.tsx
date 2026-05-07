@@ -337,19 +337,28 @@ export function PeerVideoCall({ peerId }: { peerId: string }) {
   }, [peerId]);
 
   return (
-    <div className="flex flex-col w-full gap-4 p-4 ">
-      <div className="text-sm text-muted-foreground shrink-0 w-full">
-        <div>
-          Calling user id: <code className="text-primary">{peerId}</code>
+    <div className="flex flex-col w-full min-h-full h-full gap-4 p-2 md:p-4 overflow-hidden">
+      
+      <div className="text-xs md:text-sm text-muted-foreground shrink-0 w-full bg-white/5 p-2 rounded-lg">
+        <div className="truncate">
+          Calling user id: <code className="text-primary font-mono">{peerId}</code>
         </div>
-        <div className="mt-1">{statusNote}</div>
+        <div className="mt-1 font-medium italic">{statusNote}</div>
       </div>
-      <div className="h-full">
-        {phase === "unauthorized" || phase === "error" ? null : (
-          <div className="grid gap-6 md:grid-cols-2 flex-1 min-h-0 h-full">
-            <section className="flex flex-col min-h-0 w-full justify-items-center">
-              <p className="mb-2 text-2xl text-blue-800 font-bold shrink-0 bg-blue-500/50 rounded-2xl text-center">You</p>
-              <div className="flex-1 h-full bg-blue-800/20 rounded-xl">
+
+      <div className="flex-1 min-h-0">
+        {phase === "unauthorized" || phase === "error" ? (
+          <div className="flex h-full items-center justify-center text-destructive">
+            Connection Error or Unauthorized
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 h-full min-h-0">
+            
+            <section className="flex flex-col min-h-0 h-full">
+              <p className="mb-2 text-lg md:text-2xl text-blue-800 font-bold shrink-0 bg-blue-500/50 rounded-xl md:rounded-2xl text-center py-1">
+                You
+              </p>
+              <div className="flex-1 min-h-[200px] md:min-h-0 bg-blue-800/20 rounded-xl overflow-hidden relative">
                 {localStream && self ? (
                   <Webcam
                     videoStream={localStream}
@@ -360,16 +369,18 @@ export function PeerVideoCall({ peerId }: { peerId: string }) {
                     onPredictionImageReady={emitGesturePreview}
                   />
                 ) : (
-                  <div className="text-sm text-muted-foreground flex justify-center">
-                    {phase === "waiting-peer" ? "Camera starts after peer joins." : "…"}
+                  <div className="h-full flex items-center justify-center text-center p-4 text-sm text-muted-foreground">
+                    {phase === "waiting-peer" ? "Camera starts after peer joins." : "Loading camera…"}
                   </div>
                 )}
               </div>
             </section>
 
-            <section className="flex flex-col min-h-0">
-              <p className="mb-2 text-2xl text-red-800 font-bold shrink-0 bg-red-500/50 rounded-2xl text-center">Peer</p>
-              <div className="flex-1 min-h-0 h-full bg-red-800/20 rounded-xl">
+            <section className="flex flex-col min-h-0 h-full">
+              <p className="mb-2 text-lg md:text-2xl text-red-800 font-bold shrink-0 bg-red-500/50 rounded-xl md:rounded-2xl text-center py-1">
+                Peer
+              </p>
+              <div className="flex-1 min-h-[200px] md:min-h-0 bg-red-800/20 rounded-xl overflow-hidden relative">
                 {remoteStream && self ? (
                   <Webcam
                     videoStream={remoteStream}
@@ -382,14 +393,15 @@ export function PeerVideoCall({ peerId }: { peerId: string }) {
                     remoteImageUrl={peerGesturePreview?.imageUrl}
                   />
                 ) : (
-                  <div className="text-sm text-muted-foreground flex justify-center">
+                  <div className="h-full flex items-center justify-center text-center p-4 text-sm text-muted-foreground">
                     {phase === "waiting-peer"
-                      ? "Waiting…"
-                      : "Remote video appears when the connection is ready."}
+                      ? "Waiting for peer to join…"
+                      : "Remote video appears when ready."}
                   </div>
                 )}
               </div>
             </section>
+
           </div>
         )}
       </div>

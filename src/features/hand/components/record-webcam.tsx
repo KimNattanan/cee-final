@@ -70,17 +70,64 @@ const DataBox = ({
     }
   };
   return (
-    <div className="justify-items-center p-3 border-2 gap-y-3 rounded-2xl my-3">
-      <Input type="text" value={gestureName} onChange={handleChangeName} placeholder="name" />
-      <Input type="text" value={gestureText} onChange={handleChangeText} placeholder="text" />
-      <div className="flex gap-5">
-        <Button onClick={handleUpdate} disabled={isUpdating || isDeleting}>Update</Button>
-        <Button onClick={handleDelete} disabled={isUpdating || isDeleting}>Delete</Button>
-        <Button
-          style={{backgroundColor: isSelecting ? 'red' : 'gray'}}
-          onClick={handleSelect}
-          disabled={isUpdating || isDeleting}
-        >Select</Button>
+    <div className={`flex flex-col gap-3 p-3 border-2 rounded-xl bg-white/5 shadow-sm transition-all ${isSelecting ? 'border-primary/50 bg-primary/5' : 'border-white/10'}`}>
+      
+      <div className="flex flex-col gap-2">
+        <div className="relative">
+          <span className="absolute -top-2 left-2 bg-gray-100/90 rounded-xl px-1 text-[10px] text-black uppercase">Name</span>
+          <Input 
+            type="text" 
+            value={gestureName} 
+            onChange={handleChangeName} 
+            placeholder="Gesture Name" 
+            className="h-9 text-sm bg-transparent"
+          />
+        </div>
+        <div className="relative">
+          <span className="absolute -top-2 left-2 bg-gray-100/90 rounded-xl px-1 text-[10px] text-black uppercase">Output Text</span>
+          <Input 
+            type="text" 
+            value={gestureText} 
+            onChange={handleChangeText} 
+            placeholder="Display Text" 
+            className="h-9 text-sm bg-transparent"
+          />
+        </div>
+      </div>
+
+      <div className="gap-2 justify-items-center">
+        <div className="grid grid-cols-2 gap-2 w-full justify-items-center">
+          <Button 
+            size="sm" 
+            variant="secondary"
+            onClick={handleUpdate} 
+            disabled={isUpdating || isDeleting}
+            className="h-8 text-xs"
+          >
+            Update
+          </Button>
+          <Button 
+            size="sm" 
+            variant="destructive"
+            onClick={handleDelete} 
+            disabled={isUpdating || isDeleting}
+            className="h-8 text-xs border-1 border-red-500 bg-red-950/40 text-red-500"
+          >
+            Delete
+          </Button>
+        </div>
+        <Button 
+          size="sm"
+          onClick={handleSelect} 
+          disabled={isUpdating || isDeleting} 
+          className={`col-span-2 h-8 text-xs transition-colors ${
+            isSelecting 
+              ? 'bg-red-600 hover:bg-red-700' 
+              : 'bg-emerald-600 hover:bg-emerald-700'
+          }`}
+        >
+          {isSelecting ? 'Deselect (Current)' : 'Select for Training'}
+        </Button>
       </div>
     </div>
   )
@@ -230,99 +277,120 @@ export const Webcam = ({
     };
   }, [videoStream]);
   return (
-    <div className="max-w-full flex flex-col items-center py-5 gap-y-5">
-      <div className="flex w-full px-5 justify-between">
-        <p>Username : {username}</p>
-        <p>Email : {email}</p>
+    <div className="flex max-w-full flex-col items-center gap-y-8 py-5">
+      
+      <div className="flex w-full flex-col gap-2 px-5 text-sm sm:flex-row sm:justify-between sm:text-base">
+        <p className="font-medium">Username: <span className="font-normal opacity-90">{username}</span></p>
+        <p className="font-medium">Email: <span className="font-normal opacity-90">{email}</span></p>
       </div>
-      <div className="flex justify-center gap-5">
-        <video
+
+      <div className="flex w-full flex-col items-center justify-center gap-6 px-5 lg:flex-row lg:items-start lg:gap-10">
+        
+        <div className="relative w-full max-w-[400px] overflow-hidden rounded-xl border-2 border-white/20 shadow-lg">
+          <video
             ref={videoRef}
-            width={320}
-            height={240}
             autoPlay
             playsInline
             muted={muted}
+            className="h-auto w-full"
             style={{ transform: 'scaleX(-1)' }}
           />
+        </div>
           
-        <div className="p-5 flex flex-col gap-5">
-          <Input type="text" value={newHandgestureName} onChange={handleChangename} placeholder="Gesture Name..." />
-          <Input type="text" value={newHandgestureText} onChange={handleChangetext} placeholder="Gesture Text..." />
-          <p className="text-xs">Gesture Text = "[[anime]]" for Anime Gesture</p>
+        <div className="flex w-full max-w-md flex-col gap-4 rounded-2xl bg-white/5 p-5 backdrop-blur-md lg:p-6">
+          <h3 className="text-lg font-bold">New Gesture</h3>
+          <Input type="text" value={newHandgestureName} onChange={handleChangename} placeholder="Gesture Name..." className="h-11" />
+          <Input type="text" value={newHandgestureText} onChange={handleChangetext} placeholder="Gesture Text..." className="h-11" />
+          
+          <p className="text-[12px] text-amber-200/80 md:text-sm">
+            Tip: Use <span className="font-mono">"[[anime]]"</span> for Anime Gesture
+          </p>
+
           <Select value={newHandgestureSelected} onValueChange={(value:string)=>setNewHandgestureSelected(value)}>
-            <SelectTrigger>
+            <SelectTrigger className="h-11">
               <SelectValue placeholder="Select a gesture" />
             </SelectTrigger>
-            <SelectContent className="bg-transparent">
-              <SelectItem value="1" className="bg-white/60 text-black">one hand</SelectItem>
-              <SelectItem value="2" className="bg-white/60 text-black">two hand</SelectItem>
-              <SelectItem value="3" className="bg-white/60 text-black">two hand relate</SelectItem>
+            <SelectContent className="bg-slate-900 text-white">
+              <SelectItem value="1">one hand</SelectItem>
+              <SelectItem value="2">two hand</SelectItem>
+              <SelectItem value="3">two hand relate</SelectItem>
             </SelectContent>
           </Select>
-          <Button onClick={handleClick} >create new gesture</Button>
+
+          <Button onClick={handleClick} className="h-11 w-full bg-primary hover:bg-primary/80">
+            Create New Gesture
+          </Button>
         </div>
       </div>
-      <div className="flex gap-5 align-middle">
-        <span>Delay Time : </span>
-        <Input
-          className="min-w-15 w-fit"
-          type="number"
-          value={delayRecordTime ? delayRecordTime/1000 : 0}
-          onChange={(e:ChangeEvent<HTMLInputElement>)=>{
-            setDelayRecordTime(parseInt(e.target.value)*1000)
-          }}
-          placeholder="delaytime"
-        />
-        <span>seconds</span>
-        <Button onClick={recordHand} disabled={recording || !currentselect}>{recording ? "Recording..." : "Record"}</Button>
+
+      <div className="flex w-full max-w-2xl flex-wrap items-center justify-center gap-4 border-y border-white/10 py-6 px-5">
+        <div className="flex items-center gap-3">
+          <span className="whitespace-nowrap">Delay Time:</span>
+          <Input
+            className="w-20 text-center"
+            type="number"
+            value={delayRecordTime ? delayRecordTime/1000 : 0}
+            onChange={(e:ChangeEvent<HTMLInputElement>)=>{
+              setDelayRecordTime(parseInt(e.target.value)*1000)
+            }}
+          />
+          <span>seconds</span>
+        </div>
+        
+        <Button 
+          onClick={recordHand} 
+          disabled={recording || !currentselect}
+          variant={recording ? "destructive" : "default"}
+          className="min-w-[140px] shadow-lg transition-all"
+        >
+          {recording ? "● Recording..." : "Start Record"}
+        </Button>
       </div>  
-      <div className="grid grid-cols-3 w-full gap-x-5 px-5">
-        <div className="justify-items-center bg-red-500/40 rounded-2xl p-5 gap-3">
-          <h2>1 hand</h2>
-          {data1Hand.map((d) => (
-            <DataBox
-              key={d.id}
-              id={d.id}
-              gestureName={d.gestureName}
-              gestureText={d.gestureText}
+
+      <div className="grid w-full grid-cols-1 gap-6 px-5 md:grid-cols-2 lg:grid-cols-3">
+        
+        <div className="flex flex-col items-center gap-3 rounded-2xl bg-red-500/20 p-5 shadow-inner">
+          <h2 className="text-xl font-bold border-b border-red-500/30 w-full text-center pb-2">1 Hand</h2>
+          <div className="w-full space-y-3">
+            {data1Hand.map((d) => (
+              <DataBox
+              key={d.id} {...d}
               setData={setData1Hand}
               handleSelect={()=>handleSelect(d)}
               isSelecting={currentselect?.id === d.id}
-              invalidateData={invalidateData}
-            />
-          ))}
+              invalidateData={invalidateData} />
+            ))}
+          </div>
         </div>
-        <div className="justify-items-center bg-blue-500/40 rounded-2xl p-5 gap-3">
-          <h2>2 hand</h2>
-          {data2Hand.map((d) => (
-            <DataBox
-              key={d.id}
-              id={d.id}
-              gestureName={d.gestureName}
-              gestureText={d.gestureText}
+
+        <div className="flex flex-col items-center gap-3 rounded-2xl bg-blue-500/20 p-5 shadow-inner">
+          <h2 className="text-xl font-bold border-b border-blue-500/30 w-full text-center pb-2">2 Hand</h2>
+          <div className="w-full space-y-3">
+            {data2Hand.map((d) => (
+              <DataBox
+              key={d.id} {...d}
               setData={setData2Hand}
-              handleSelect={()=>handleSelect(d)}
+              handleSelect={()=>handleSelect(d)} 
               isSelecting={currentselect?.id === d.id}
-              invalidateData={invalidateData}
-            />
-          ))}
+              invalidateData={invalidateData} />
+            ))}
+          </div>
         </div>
-        <div className="justify-items-center bg-purple-500/40 rounded-2xl p-5 gap-3">
-          <h2>2 hand Relate</h2>
-          {data2HandRelate.map((d) => (
-            <DataBox
-              key={d.id}
-              id={d.id}
-              gestureName={d.gestureName}
-              gestureText={d.gestureText}
+
+        <div className="flex flex-col items-center gap-3 rounded-2xl bg-purple-500/20 p-5 shadow-inner">
+          <h2 className="text-xl font-bold border-b border-purple-500/30 w-full text-center pb-2">2 Hand Relate</h2>
+          <div className="w-full space-y-3">
+            {data2HandRelate.map((d) => (
+              <DataBox
+              key={d.id} {...d}
               setData={setData2HandRelate}
               handleSelect={()=>handleSelect(d)}
               isSelecting={currentselect?.id === d.id}
-              invalidateData={invalidateData}
-            />
-          ))}
+              invalidateData={invalidateData} />
+            ))}
+          </div>
         </div>
+        
       </div>
     </div>
   );
