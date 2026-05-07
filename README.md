@@ -1,14 +1,14 @@
-# Comess (cee-final)
+# SpellCam
 
-A full-stack web application that combines **account-based access**, **real-time peer video**, and **camera-driven hand-gesture recognition**. Gestures are classified with MediaPipe and mapped to themed preview images; during a call, preview selections are synchronized between peers so both sides see the same artwork when labels agree.
+A full-stack web application that combines **account-based access**, **real-time peer video**, and **camera-driven hand-gesture recognition**. Gestures are classified with MediaPipe and the **predicted label is shown as text** on screen; when the prediction equals the special **ANIME_SPELL** gesture (`[[anime]]`), the UI loads and displays a **random anime image** instead of repeating that token as plain text. During a call, peers synchronize the current prediction and the resolved image URL so both sides see the same illustration.
 
 ## Features
 
 - **Authentication** — Register and sign in with credentials stored in MongoDB; sessions use signed JWTs delivered via HTTP-only cookies.
-- **Solo webcam** — Local camera feed with continuous hand tracking and gesture-based preview images.
+- **Solo webcam** — Local camera feed with continuous hand tracking; shows the predicted gesture as text and loads a random anime image only when **ANIME_SPELL** is detected.
 - **Custom gesture recording** — `/record` lets each user create, update, delete, and record their own gesture templates (1-hand, 2-hand, and 2-hand-relate) stored in MongoDB.
 - **Peer video calls** — WebRTC (camera + microphone) with Socket.IO signaling on the same process as the Next.js app; canonical rooms pair two authenticated users.
-- **Gesture sync** — Each caller publishes their chosen preview URL over the signaling channel so the remote participant can reuse the same image when the predicted label matches.
+- **Gesture sync** — Over a WebRTC **data channel**, each peer sends the latest predicted label and, only for **ANIME_SPELL**, the fetched anime image URL so the remote feed can render the same picture; other gestures carry an empty image URL and the partner relies on the synced label for matching text.
 
 ## Tech stack
 
