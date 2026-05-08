@@ -38,7 +38,6 @@ export async function getServerCookies() {
         .map((c) => `${c.name}=${c.value}`)
         .join('; ');
     } catch (error) {
-      console.error('Failed to access cookies:', error);
       return '';
     }
   });
@@ -65,7 +64,6 @@ async function fetchApi<T>(
   }
 
   const fullUrl = buildUrlWithParams(`${process.env.NEXT_PUBLIC_API_URL}${url}`, params);
-  console.log(fullUrl);
   const response = await fetch(fullUrl, {
     method,
     headers: {

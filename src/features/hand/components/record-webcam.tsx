@@ -167,7 +167,6 @@ export const Webcam = ({
   };
 
   async function recordHand() {
-    console.log(recording, currentselect);
     if(recording){return;}
     if(!currentselect){
         return
