@@ -1,4 +1,5 @@
 import { HandLandmarker, FilesetResolver, HandLandmarkerResult, NormalizedLandmark } from "@mediapipe/tasks-vision";
+import { api } from "./api-client";
 
 const HANDS_OUTPUT_DIR = '/hand_gesture_detection';
 const THRESHOLD_1_HAND = 4.0;
@@ -9,18 +10,21 @@ function apiBase() {
 }
 // 1. Load your JSON datasets
 export const loadData = async ():Promise<{ data1Hand: any[], data2Hand: any[],data2HandRelate: any[] }> => {
-  const handData:{
-    data:[
-      {handmode:number}
-    ]
-  } = await fetch(`${apiBase()}/hand`).then(res => res.json());
-  // const data1Hand = await fetch(`${HANDS_OUTPUT_DIR}/hand1output.json`).then(res => res.json());
-  // const data2Hand = await fetch(`${HANDS_OUTPUT_DIR}/hand2output.json`).then(res => res.json());
-  // const data2HandRelate = await fetch(`${HANDS_OUTPUT_DIR}/hand2relateoutput.json`).then(res => res.json());
-  const data1Hand = handData.data.filter(hand => hand.handmode===1);
-  const data2Hand = handData.data.filter(hand => hand.handmode===2);
-  const data2HandRelate = handData.data.filter(hand => hand.handmode===3);
-  return { data1Hand, data2Hand,data2HandRelate };
+  try {
+    const handData = await api.get<{ data: { handmode: number }[] }>(`/hand`);
+    // const data1Hand = await fetch(`${HANDS_OUTPUT_DIR}/hand1output.json`).then(res => res.json());
+    // const data2Hand = await fetch(`${HANDS_OUTPUT_DIR}/hand2output.json`).then(res => res.json());
+    // const data2HandRelate = await fetch(`${HANDS_OUTPUT_DIR}/hand2relateoutput.json`).then(res => res.json());
+    const data1Hand = handData.data.filter(hand => hand.handmode===1);
+    const data2Hand = handData.data.filter(hand => hand.handmode===2);
+    const data2HandRelate = handData.data.filter(hand => hand.handmode===3);
+    return { data1Hand, data2Hand,data2HandRelate };
+  } catch (error) {
+    if (error instanceof Error && error.message === "Unauthorized") {
+      window.location.href = "/login";
+    }
+    return { data1Hand: [], data2Hand: [],data2HandRelate: [] };
+  }
 }
 
 // 2. Initialize MediaPipe

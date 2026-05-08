@@ -9,7 +9,7 @@ import { UserResponse } from "@/features/auth/types/users";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const [user, setUser] = useState<UserResponse | null>(null);
+  const [user, setUser] = useState<UserResponse | null | undefined>(undefined);
   useEffect(() => {
     getUser().then(setUser);
   }, []);
@@ -19,29 +19,42 @@ export default function Home() {
       <div className="animate-color-change flex w-full flex-col items-center gap-y-4 py-5 md:flex-row md:justify-between md:px-10">
         
         <div className="w-full px-5 text-center md:w-auto md:text-left">
-          <h2 className="text-sm font-medium md:text-xl">Your ID: {user?.userId}</h2>
+          <h2 className="text-sm font-medium md:text-xl">Your ID: {user?.userId ?? user === undefined ? 'Loading...' : 'Not logged in'}</h2>
         </div>
 
         <div className="flex flex-wrap justify-center gap-3 px-5 md:justify-end">
-          {user?.userId ? (
+          {user?.userId ? <>
+
             <LogoutButton />
-          ) : (
+            
+            <Link href="/webcam">
+              <Button variant="plant" className="px-3 py-1 text-sm md:text-base">Webcam</Button>
+            </Link>
+
+            <Link href="/record">
+              <Button variant="plant" className="px-3 py-1 text-sm md:text-base">Record</Button>
+            </Link>
+
+          </> : user === undefined ? <>
+
+            <Button variant={"plant"} disabled={true}>Logout</Button>
+            
+            <Button variant="plant" className="px-3 py-1 text-sm md:text-base" disabled={true}>Webcam</Button>
+
+            <Button variant="plant" className="px-3 py-1 text-sm md:text-base" disabled={true}>Record</Button>
+
+          </> : <>
+
             <Link href="/login">
               <Button variant="plant" className="px-3 py-1 text-sm md:text-base">Login</Button>
             </Link>
-          )}
+            
+            <Link href="/register">
+              <Button variant="plant" className="px-3 py-1 text-sm md:text-base">Register</Button>
+            </Link>
+
+          </>}
           
-          <Link href="/register">
-            <Button variant="plant" className="px-3 py-1 text-sm md:text-base">Register</Button>
-          </Link>
-          
-          <Link href="/webcam">
-            <Button variant="plant" className="px-3 py-1 text-sm md:text-base">Webcam</Button>
-          </Link>
-          
-          <Link href="/record">
-            <Button variant="plant" className="px-3 py-1 text-sm md:text-base">Record</Button>
-          </Link>
         </div>
       </div>
 
