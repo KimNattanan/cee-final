@@ -19,7 +19,7 @@ export default function Home() {
       <div className="animate-color-change flex w-full flex-col items-center gap-y-4 py-5 md:flex-row md:justify-between md:px-10">
         
         <div className="w-full px-5 text-center md:w-auto md:text-left">
-          <h2 className="text-sm font-medium md:text-xl">Your ID: {user?.userId ?? user === undefined ? 'Loading...' : 'Not logged in'}</h2>
+          <h2 className="text-sm font-medium md:text-xl">Your ID: {user?.userId ?? (user === undefined ? 'Loading...' : 'Not logged in')}</h2>
         </div>
 
         <div className="flex flex-wrap justify-center gap-3 px-5 md:justify-end">
