@@ -1,3 +1,13 @@
+<p align="center">
+  <a href='#'>
+    <img 
+      src="https://raw.githubusercontent.com/KimNattanan/spellcam/refs/heads/main/public/img/spellcam-thumb.png"
+      alt="spellcam"
+      width="480"
+    />
+  </a>
+</p>
+
 # SpellCam
 
 A full-stack web application that combines **account-based access**, **real-time peer video**, and **camera-driven hand-gesture recognition**. Gestures are classified with MediaPipe and the **predicted label is shown as text** on screen; when the prediction equals the special **ANIME_SPELL** gesture (`[[anime]]`), the UI loads and displays a **random anime image** instead of repeating that token as plain text. During a call, peers synchronize the current prediction and the resolved image URL so both sides see the same illustration.
