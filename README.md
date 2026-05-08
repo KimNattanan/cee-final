@@ -18,7 +18,7 @@ A full-stack web application that combines **account-based access**, **real-time
 | Server | Custom Node HTTP server (`server.ts`) hosting Next and [Socket.IO](https://socket.io/) |
 | Data | [MongoDB](https://www.mongodb.com/) via [Mongoose](https://mongoosejs.com/) |
 | Auth | [jose](https://github.com/panva/jose) (JWT), [bcryptjs](https://github.com/dcodeIO/bcrypt.js) |
-| Vision | [@mediapipe/tasks-vision](https://google.github.io/mediapipe/) Hand Landmarker |
+| Vision | [@mediapipe/tasks-vision](https://ai.google.dev/edge/api/mediapipe/js/tasks-vision) Hand Landmarker |
 | UI | Tailwind CSS 4, [Radix](https://www.radix-ui.com/) / shadcn-style components, Sonner toasts |
 
 Gesture reference data and model assets are loaded from `public/hand_gesture_detection/` and the MediaPipe CDN.
