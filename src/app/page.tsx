@@ -35,7 +35,7 @@ export default function Home() {
               <Button variant="plant" className="px-3 py-1 text-sm md:text-base">Record</Button>
             </Link>
 
-          </> : user === undefined ? <>
+          </> : (user === undefined ? <>
 
             <Button variant={"plant"} disabled={true}>Logout</Button>
             
@@ -53,7 +53,7 @@ export default function Home() {
               <Button variant="plant" className="px-3 py-1 text-sm md:text-base">Register</Button>
             </Link>
 
-          </>}
+          </>)}
           
         </div>
       </div>
